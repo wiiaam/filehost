@@ -1,0 +1,4 @@
+{
+  "filedir":"/path/to/nginx/files/",
+  "host":"http://example.com/files/"
+}
