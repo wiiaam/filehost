@@ -54,6 +54,10 @@ class ServerHandler(http.server.SimpleHTTPRequestHandler):
                     usecustomname = False
                 elif "../" in customname:
                     validfilename = False
+                elif "//" in customname:
+                    validfilename = False
+                elif customname[:1] == "/":
+                    validfilename = False
                 elif customname[-1:] == "/":
                     validfilename = False
                 else:
