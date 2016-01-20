@@ -44,7 +44,6 @@ class ServerHandler(http.server.SimpleHTTPRequestHandler):
                 key = form.getfirst("key")
                 keymatch = auths.chechPass(key)
 
-            usecustomname = False
             customname = ""
             if form.__contains__("fname"):
                 customname = form.getfirst("fname")
@@ -77,7 +76,7 @@ class ServerHandler(http.server.SimpleHTTPRequestHandler):
                     split = fn.split(".")
                     length = len(split)
                     extention = split[length - 1]
-                    if usecustomname is True:
+                    if customname != "":
                         filename = customname
                     else:
                         filename = fn[:-(len(extention) + 1)]
