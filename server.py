@@ -50,20 +50,21 @@ class ServerHandler(http.server.SimpleHTTPRequestHandler):
             if form.__contains__("fname"):
                 customname = form.getfirst("fname")
                 usecustomname = True
-                if "../" in customname:
+                if customname == "":
+                    usecustomname = False
+                elif "../" in customname:
                     validfilename = False
-                if customname[:-1] == "/":
+                elif customname[-1:] == "/":
                     validfilename = False
-                split = customname.split(".")
-                length = len(split)
-                if length is not 1:
-                    extention = split[length - 1]
-                    length = len(split)
-                    customname = customname[:-(len(extention) + 1)]
                 else:
-                    validfilename = False
+                    split = customname.split(".")
+                    length = len(split)
+                    if length is not 1:
+                        extention = split[length - 1]
+                        length = len(split)
+                        customname = customname[:-(len(extention) + 1)]
 
-                print("Custom file name: " + customname)
+                    print("Custom file name: " + customname)
 
             customoutput = ""
             if form.__contains__("output"):
