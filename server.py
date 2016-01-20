@@ -17,8 +17,12 @@ PORT = config["port"]
 
 class ServerHandler(http.server.SimpleHTTPRequestHandler):
     def do_GET(self):
-        self.path = '/upload.html'
-        return http.server.SimpleHTTPRequestHandler.do_GET(self)
+        with open("upload.html", "rb") as upload:
+            data = upload.read()
+            self.send_response(200)
+            self.send_header("Content-type", "text/html")
+            self.end_headers()
+            self.wfile.write(data)
 
     def do_POST(self):
         try:
