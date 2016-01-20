@@ -44,16 +44,24 @@ class ServerHandler(http.server.SimpleHTTPRequestHandler):
                 key = form.getfirst("key")
                 keymatch = auths.chechPass(key)
 
+
+            validfilename = True
             customname = ""
             if form.__contains__("fname"):
                 customname = form.getfirst("fname")
                 usecustomname = True
+                if "../" in customname:
+                    validfilename = False
+                if customname[:-1] == "/":
+                    validfilename = False
                 split = customname.split(".")
                 length = len(split)
                 if length is not 1:
                     extention = split[length - 1]
                     length = len(split)
                     customname = customname[:-(len(extention) + 1)]
+                else:
+                    validfilename = False
 
                 print("Custom file name: " + customname)
 
@@ -68,63 +76,63 @@ class ServerHandler(http.server.SimpleHTTPRequestHandler):
 
             hasfile = True
             fn = ""
-            validfilename = True
-            if form.__contains__("file") and keymatch is True:
-                fileitem = form["file"]
-                if fileitem.filename:
-                    fn = os.path.basename(fileitem.filename)
-                    split = fn.split(".")
-                    length = len(split)
-                    extention = split[length - 1]
-                    if customname != "":
-                        filename = customname
+            if validfilename is True:
+                if form.__contains__("file") and keymatch is True:
+                    fileitem = form["file"]
+                    if fileitem.filename:
+                        fn = os.path.basename(fileitem.filename)
+                        split = fn.split(".")
+                        length = len(split)
+                        extention = split[length - 1]
+                        if customname != "":
+                            filename = customname
+                        else:
+                            filename = fn[:-(len(extention) + 1)]
+                        print("Filename: " + filename + " Extension: " + str(extention))
+                        fileexists = True
+                        fn = filename + "." + str(extention)
+                        try:
+                            newfile = open(config["filedir"] + fn)
+
+                        except FileNotFoundError:
+                            fileexists = False
+                        except OSError:
+                            validfilename = False
+
+                        if fileexists and validfilename:
+                            inc = 1
+                            orig = fn
+                            while (fileexists):
+                                fn = filename + str(inc) + "." + str(extention)
+                                try:
+                                 newfile = open(config["filedir"] + fn)
+
+                                except FileNotFoundError:
+                                    fileexists = False
+
+                                if fileexists:
+                                    inc += 1
+
+                                else:
+                                    os.makedirs(os.path.dirname(config["filedir"] + fn), exist_ok=True)
+                                    open(config["filedir"] + fn, 'wb').write(fileitem.file.read())
+
+                            message = 'The file "' + fn + '" was uploaded successfully'
+                        elif validfilename:
+                            os.makedirs(os.path.dirname(config["filedir"] + fn), exist_ok=True)
+                            open(config["filedir"] + fn, 'wb').write(fileitem.file.read())
+
+                            message = 'The file "' + fn + '" was uploaded successfully'
+                        else:
+                            message = "Invalid file name"
+
                     else:
-                        filename = fn[:-(len(extention) + 1)]
-                    print("Filename: " + filename + " Extension: " + str(extention))
-                    fileexists = True
-                    fn = filename + "." + str(extention)
-                    try:
-                        newfile = open(config["filedir"] + fn)
+                        message = 'No file was uploaded'
+                        hasfile = False
 
-                    except FileNotFoundError:
-                        fileexists = False
-                    except OSError:
-                        validfilename = False
-
-                    if fileexists and validfilename:
-                        inc = 1
-                        orig = fn
-                        while (fileexists):
-                            fn = filename + str(inc) + "." + str(extention)
-                            try:
-                                newfile = open(config["filedir"] + fn)
-
-                            except FileNotFoundError:
-                                fileexists = False
-
-                            if fileexists:
-                                inc += 1
-
-                            else:
-                                os.makedirs(os.path.dirname(config["filedir"] + fn), exist_ok=True)
-                                open(config["filedir"] + fn, 'wb').write(fileitem.file.read())
-
-                        message = 'The file "' + fn + '" was uploaded successfully'
-                    elif validfilename:
-                        os.makedirs(os.path.dirname(config["filedir"] + fn), exist_ok=True)
-                        open(config["filedir"] + fn, 'wb').write(fileitem.file.read())
-
-                        message = 'The file "' + fn + '" was uploaded successfully'
-                    else:
-                        message = "Invalid file name"
-
+                    print(message)
                 else:
-                    message = 'No file was uploaded'
                     hasfile = False
-
-                print(message)
-            else:
-                hasfile = False
 
             print("\n")
 
