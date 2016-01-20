@@ -1,4 +1,5 @@
 {
-  "filedir":"/path/to/nginx/files/",
-  "host":"http://example.com/files/"
+  "filedir":"path to save location/",
+  "host":"http://example.com/files/",
+  "port":8050
 }
