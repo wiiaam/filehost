@@ -9,7 +9,7 @@ import auths
 import json
 import os.path
 
-PORT = 8000
+PORT = 8050
 
 with open("config.json") as file:
     config = json.load(file)
